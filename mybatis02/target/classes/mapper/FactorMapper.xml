@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 配置SQL语句，与实体类操作的对应关系。 -->
+<!-- 保证唯一性 -->
+<!-- 使用接口方式 加载命名空间 使用代理模式 -->
+<mapper namespace="com.pctc.dao.FactorMapper">
+
+    <resultMap id="FactorMap" type="com.pctc.model.Factor">
+        <result column="t_id" property="id"/>
+        <result column="t_factorname" property="factorName"/>
+    </resultMap>
+
+    <!--根据id查询数据表中的一条记录-->
+    <select id="getFactorId" resultMap="FactorMap">
+        select * from factor where t_id = #{id};
+    </select>
+
+    <resultMap id="FactorMap1" type="com.pctc.model.Factor">
+        <result column="t_id" property="id"/>
+        <result column="t_factorname" property="factorName"/>
+
+        <collection property="workers" ofType="com.pctc.model.Worker">
+            <id column="t_id1" property="id"/>
+            <result column="t_name" property="name"/>
+            <result column="t_age" property="age"/>
+            <result column="t_birthday" property="birthday"/>
+        </collection>
+    </resultMap>
+
+    <select id="getFactorId1" resultMap="FactorMap1">
+select a.*,b.t_id as t_id1,b.t_name,b.t_age,b.t_birthday from factor a, worker b where a.t_id=b.t_fid and a.t_id=#{id};
+    </select>
+    <!---->
+    <resultMap id="FactorMap2" type="com.pctc.model.Factor">
+        <result column="t_id" property="id"/>
+        <result column="t_factorname" property="factorName"/>
+        <collection property="workers"
+                    select="com.pctc.dao.WorkerMapper.getWorkersByFactorId"
+                    column="{fid=t_id}"
+                    fetchType="lazy">
+        </collection><!--t_id为factor的主键-->
+    </resultMap>
+
+
+    <select id="getFactorId2" resultMap="FactorMap2">
+         select * from factor where t_id=#{id}
+    </select>
+    <!---->
+    <resultMap id="FactorMap3" type="com.pctc.Vo.WorkerFactorVo">
+        <result column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthDate"/>
+        <result column="t_factorname" property="factoryName"/>
+    </resultMap>
+
+    <select id="getFactorVoById" resultMap="FactorMap3">
+    SELECT a.*,b.* from worker a,factor b WHERE a.t_fid = b.t_id and b.t_id = #{id}
+    </select>
+
+
+</mapper>

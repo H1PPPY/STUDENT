@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pctc.dao.WorkerMapper">
+
+    <resultMap id="WorkerMap" type="com.pctc.model.Worker">
+        <result property="id" column="t_id"/>
+        <result property="name" column="t_name"/>
+        <result property="age" column="t_age"/>
+        <result property="birthday" column="t_birthday"/>
+    </resultMap>
+
+    <sql id="Base_Colum_List">
+        t_id,t_name,t_age,t_birthday
+    </sql>
+
+    <select id="selectWorkerByPage" resultMap="WorkerMap" parameterType="java.util.Map">
+        select <include refid="Base_Colum_List"/> from worker limit #{recordNum},#{pageSize}
+    </select>
+    
+    <!--自定义条件查询 使用bind标签-->
+    <select id="selectWorkerByPagePlug"  resultMap="WorkerMap">
+        select <include refid="Base_Colum_List"/> from worker
+        <where>
+            <if test="id != null">
+                and t_id = #{workName}
+            </if>
+            <if test="name != null and name != ''">
+                <bind name="workerName" value="'%'+name+'%'"/>
+                and t_name = #{workerName}
+            </if>
+            <if test="age != null and age !=''" >
+                and t_age = #{age}
+            </if>
+        </where>
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 配置SQL语句，与实体类操作的对应关系。 -->
+<!-- 保证唯一性 -->
+<!-- 使用接口方式 加载命名空间 使用代理模式 -->
+<mapper namespace="com.pctc.dao.WorkerMapper">
+
+    <resultMap id="WorkerMap1" type="com.pctc.model.Worker">
+        <id column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthday"/>
+
+        <!--关联字段-->
+        <result column="t_id1" property="factor.id"/>
+        <result column="t_name1" property="factor.factorName"/>
+    </resultMap>
+
+    <!--根据ID查询数据表中的一条记录-->
+    <select id="getWorkerById" resultMap="WorkerMap1">
+        select a.*,b.t_id as t_id1,b.t_factorname as t_name1 from worker a,factor b where a.t_fid=b.t_id and a.t_id=#{id};
+    </select>
+    <!---->
+    <!--使用association定义关联的单个对象的封装规则-->
+
+    <resultMap id="WorkerMap2" type="com.pctc.model.Worker">
+        <id column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthday"/>
+
+        <!--  association可以指定联合的JavaBean对象
+        property="school": 指定哪个属性是联合的对象
+        JavaType：指定这个属性对象的类型(不能省略)-->
+
+        <association property="factor" javaType="com.pctc.model.Factor">
+            <id column="t_id1" property="id"/>
+            <result column="t_name1" property="factorName"/>
+        </association>
+
+    </resultMap>
+
+    <select id="getWorkerById1" resultMap="WorkerMap2">
+        select a.*,b.t_id as t_id1,b.t_factorname as t_name1 from worker a,factor b where a.t_fid=b.t_id and a.t_id=#{id};
+    </select>
+    <!---->
+    <!-- 使用association进行分布查询：
+           1、先按照t_id查询工人信息
+           2、根据工人信息中的t_fid值去工厂表中查出工厂信息、
+           3、工厂信息设置到工人中-->
+    <resultMap id="WorkerMap3" type="com.pctc.model.Worker">
+        <id column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthday"/>
+
+        <!--  association定义关联对象的封装
+              select：表明当前属性再去调用哪个方法查出的结果
+              column：指定根据当前表中哪一列的值传给这个方法
+              流程：使用select指定的方法查出对象，并封装给property指定的属性-->
+
+        <association property="factor" select="com.pctc.dao.FactorMapper.getFactorId" column="t_fid">
+
+        </association>
+
+    </resultMap>
+
+    <!--根据id查询数据表中的一条数据-->
+    <select id="getWorkerById2" resultMap="WorkerMap3">
+        select * from Worker where t_id=#{id}
+    </select>
+    <!---->
+
+    <resultMap id="WorkerMap4" type="com.pctc.model.Worker">
+        <id column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthday"/>
+    </resultMap>
+
+    <select id="getWorkersByFactorId" resultMap="WorkerMap4">
+        select * from worker where t_fid=#{fid};
+    </select>
+<!---->
+    <resultMap id="WorkerMap5" type="com.pctc.Vo.WorkerFactorVo">
+        <result column="t_id" property="id"/>
+        <result column="t_name" property="name"/>
+        <result column="t_age" property="age"/>
+        <result column="t_birthday" property="birthDate"/>
+        <result column="t_factorname" property="factoryName"/>
+    </resultMap>
+
+    <select id="getWorkerVoById" resultMap="WorkerMap5">
+        SELECT a.*,b.* from worker a,factor b WHERE a.t_fid = b.t_id and a.t_id = #{id}
+    </select>
+
+
+
+</mapper>

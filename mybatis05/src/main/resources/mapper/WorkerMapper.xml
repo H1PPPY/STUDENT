@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.pctc.dao.WorkerMapper">
+
+
+   <cache eviction="FIFO" flushInterval="600000" size="5" readOnly="true" />
+
+    <select id="getWorkers" resultType="com.pctc.model.Worker">
+        select a.t_id as id,a.t_name as name,a.t_age as age,a.t_birthday as birthday from worker a
+        <where>
+            <if test="id != null">
+                and t_id=#{id}
+            </if>
+            <if test="name != null and name != ''">
+                and t_name like #{name}
+            </if>
+            <if test="age != null">
+                and t_age=#{age}
+            </if>
+        </where>
+    </select>
+</mapper>
