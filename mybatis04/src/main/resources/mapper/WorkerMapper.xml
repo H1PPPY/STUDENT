@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!-- 配置SQL语句，与实体类操作的对应关系。 -->
+<!-- 保证唯一性 -->
+<!-- 使用接口方式 加载命名空间 使用代理模式 -->
+<mapper namespace="com.pctc.dao.WorkerMapper">
+
+    <select id="getWorkers" resultType="com.pctc.model.Worker">
+        select a.t_id as id,a.t_name as name,a.t_age as age,a.t_birthday as birthday from worker a
+        <where>
+            <if test="id != null">
+                and t_id=#{id}
+            </if>
+            <if test="name != null and name != ''">
+                and t_name like #{name}
+            </if>
+            <if test="age != null">
+                and t_age=#{age}
+            </if>
+        </where>
+    </select>
+    <!--
+
+
+    -->
+    <select id="getWorkers1" resultType="com.pctc.model.Worker">
+    select a.t_id as id,a.t_name as name,a.t_age as age,a.t_birthday as birthday from worker a where t_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <!--
+
+    -->
+    <update id="updateWorker">
+        update worker
+        <set>
+            <if test="name !=null and name != ''">
+                t_name = #{name},
+            </if>
+            <if test="age != null and age != ''">
+                t_age = #{age},
+            </if>
+        </set>
+        where t_id = #{id};
+    </update>
+    <!--
+
+    -->
+    <sql id="testInclude">
+        (t_name,t_age)
+    </sql>
+    <insert id="insertWorkers">
+        insert into worker
+        <include refid="testInclude"></include>
+        values
+        <foreach collection="list" item="worker" separator=",">
+            (#{worker.name},#{worker.age})
+        </foreach>
+    </insert>
+
+
+
+
+
+
+</mapper>
